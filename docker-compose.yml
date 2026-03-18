@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "5000:5000"
+    extra_hosts:
+      - "moodspace.local:127.0.0.1"
+      - "blog.moodspace.local:127.0.0.1"
+      - "test.moodspace.local:127.0.0.1"
+    environment:
+      - FLAG=${FLAG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_PATH=${DB_PATH}
+      - APP_URL=${APP_URL}
+      - BOT_USERNAME=${BOT_USERNAME}
+      - BOT_PASSWORD=${BOT_PASSWORD}
+    volumes:
+      - app_data:/data
+      - ./tmp:/tmp
+    networks:
+      - moodspace-network
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    depends_on:
+      - app
+    extra_hosts:
+      - "moodspace.local:host-gateway"
+      - "blog.moodspace.local:host-gateway"
+      - "test.moodspace.local:host-gateway"
+    environment:
+      - FLAG=${FLAG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_PATH=${DB_PATH}
+      - APP_URL=${APP_URL}
+      - BOT_USERNAME=${BOT_USERNAME}
+      - BOT_PASSWORD=${BOT_PASSWORD}
+    volumes:
+      - ./bot:/bot
+      - ./tmp:/tmp
+    networks:
+      - moodspace-network
+
+volumes:
+  app_data:
+
+networks:
+  moodspace-network:
+    driver: bridge
