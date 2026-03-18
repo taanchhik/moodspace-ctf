@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="posts-column">
+        <h1>🗐 Блог Эммы</h1>
+
+        {% if current_user.is_authenticated and current_user.username == 'emma' %}
+        <div class="bio-display">
+            <span class="bio-label">ᯓ★ Моё био</span>
+            <span class="bio-value">{{ bio }}</span>
+        </div>
+        {% else %}
+        <div class="bio-display">
+            <span class="bio-label">ᯓ★ Био Эммы</span>
+            <span class="bio-value placeholder">[скрыто]</span>
+        </div>
+        {% endif %}
+
+        <div class="posts-list">
+            {% for post in posts %}
+            <div class="post-card">
+                <h2><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a></h2>
+                <p class="post-content">{{ post.content }}</p>
+                <div class="post-meta">
+                    <span>{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="bot-card">
+            <h3>♥ Эмма</h3>
+            <p class="bot-description">
+                Твой личный психолог-бот!
+            </p>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
