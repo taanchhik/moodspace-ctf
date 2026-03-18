@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="posts-column">
+        <h1 style="margin-bottom: 20px;">{{ post.title }}</h1>
+        <div class="post-content" style="margin-bottom: 30px; line-height: 1.8;">{{ post.content }}</div>
+        <div class="post-meta" style="margin-bottom: 30px;">
+            <span>Автор: {{ post.author.username }}</span>
+            <span>{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="javascript:history.back()" class="btn btn-secondary">← Назад</a>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="bot-card">
+            <h3>♥ Эмма</h3>
+            <p class="bot-description">
+                Твой личный психолог-бот!
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
