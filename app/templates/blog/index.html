@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="posts-column">
+        <div class="posts-header">
+            <h2>Мои записи</h2>
+            <a href="{{ url_for('create_post') }}" class="btn btn-primary">+ Добавить пост</a>
+        </div>
+
+        {% if posts %}
+        <div class="posts-list">
+            {% for post in posts %}
+            <div class="post-card">
+                <div class="post-content">{{ post.content }}</div>
+                <div class="post-meta">
+                    <span>{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">У вас пока нет записей. Напишите что-нибудь!</p>
+        {% endif %}
+    </div>
+
+    <!-- Правая колонка: информация о боте -->
+    <div class="sidebar">
+        <div class="bot-card">
+            <h3>♥ Эмма</h3>
+            <p class="bot-description">
+                Твой личный психолог-бот. Она делится полезными советами и любит читать интересные статьи. 
+                Если найдёшь что-то стоящее - присылай ссылки, Эмма обязательно прочитает!
+            </p>
+            
+            <div class="bot-actions">
+                <a href="{{ url_for('emma_blog') }}" class="btn btn-secondary">Блог Эммы</a>
+                <a href="{{ url_for('messages') }}" class="btn btn-primary">Написать Эмме</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
