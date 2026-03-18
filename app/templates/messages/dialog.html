@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dialog-container">
+    <div class="dialog-header">
+        <h2>✉︎ Переписка с Эммой</h2>
+        <a href="javascript:history.back()" class="btn btn-secondary">← Назад</a>
+    </div>
+
+    <div class="dialog-messages" id="dialog-messages">
+        {% if messages %}
+            {% for msg in messages %}
+            <div class="message-row {% if msg.from_bot %}bot-row{% else %}user-row{% endif %}">
+                <div class="message-bubble">
+                    <div class="message-text">
+                        {% if 'http://' in msg.content or 'https://' in msg.content %}
+                            {% set words = msg.content.split(' ') %}
+                            {% for word in words %}
+                                {% if word.startswith('http://') or word.startswith('https://') %}
+                                    <a href="{{ word }}">{{ word }}</a>
+                                {% else %}
+                                    {{ word }} 
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ msg.content }}
+                        {% endif %}
+                    </div>
+                    <div class="message-time">{{ msg.created_at.strftime('%H:%M') }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Быстрые сообщения -->
+    <div class="quick-replies">
+        <button class="quick-reply" data-message="Мне грустно">😔 Грустно</button>
+        <button class="quick-reply" data-message="Мне тревожно">😰 Тревожно</button>
+        <button class="quick-reply" data-message="У меня нет сил">😫 Нет сил</button>
+    </div>
+
+    <!-- Форма отправки сообщения -->
+    <div class="message-input-container">
+        <textarea id="message-input" placeholder="Напишите Эмме..." rows="3"></textarea>
+        <button id="send-message" class="btn btn-primary">➤</button>
+    </div>
+</div>
+
+<script>
+document.getElementById('send-message').addEventListener('click', function() {
+    const input = document.getElementById('message-input');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    fetch('/api/send_message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+    })
+    .then(r => r.json())
+    .then(data => {
+        const dialog = document.getElementById('dialog-messages');
+        
+        const userRow = document.createElement('div');
+        userRow.className = 'message-row user-row';
+        userRow.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-text">${message}</div>
+                <div class="message-time">только что</div>
+            </div>
+        `;
+        dialog.appendChild(userRow);
+        
+        const botRow = document.createElement('div');
+        botRow.className = 'message-row bot-row';
+        
+        let botText = data.reply;
+        if (data.reply.includes('http://')) {
+            const words = data.reply.split(' ');
+            let htmlContent = '';
+            for (let word of words) {
+                if (word.startsWith('http://')) {
+                    htmlContent += `<a href="${word}">${word}</a> `;
+                } else {
+                    htmlContent += word + ' ';
+                }
+            }
+            botText = htmlContent;
+        }
+        
+        botRow.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-text">${botText}</div>
+                <div class="message-time">только что</div>
+            </div>
+        `;
+        dialog.appendChild(botRow);
+        
+        input.value = '';
+        dialog.scrollTop = dialog.scrollHeight;
+    });
+});
+
+document.querySelectorAll('.quick-reply').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('message-input').value = this.dataset.message;
+        document.getElementById('send-message').click();
+    });
+});
+
+window.onload = function() {
+    document.getElementById('dialog-messages').scrollTop = document.getElementById('dialog-messages').scrollHeight;
+}
+</script>
+{% endblock %}
