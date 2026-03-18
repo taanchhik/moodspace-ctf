@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="posts-column">
+        <h1 style="margin-bottom: 25px;">Новый пост</h1>
+        
+        <form method="post" class="auth-form">
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="content" style="display: block; margin-bottom: 10px; font-weight: 500;">Содержание:</label>
+                <textarea name="content" id="content" rows="10" required 
+                    style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 16px;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Опубликовать</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="sidebar">
+        <div class="bot-card">
+            <h3>♥ Эмма</h3>
+            <p class="bot-description">
+                Записывай свои мысли и чувства. Это поможет лучше понять себя!
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
