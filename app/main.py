@@ -14,6 +14,7 @@ app.config['SESSION_COOKIE_DOMAIN'] = '.moodspace.local'
 app.config['SESSION_COOKIE_PATH'] = '/'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 db.init_app(app)
@@ -66,26 +67,40 @@ def api_create_post():
         return '', 200
     
     data = request.json
+    if data is None:
+        return jsonify({'error': 'Invalid JSON'}), 400
+    
     content = data.get('content')
+    target_username = data.get('username')
     
     if not content:
         return jsonify({'error': 'Content required'}), 400
     
-    username = data.get('username')
-    if username:
-        user = User.query.filter_by(username=username).first()
-        if not user:
+    authenticated_user = None
+    if 'user_id' in session:
+        authenticated_user = User.query.get(session['user_id'])
+
+    if target_username:
+        target_user = User.query.filter_by(username=target_username).first()
+        if not target_user:
             return jsonify({'error': 'User not found'}), 404
+        
+        if not authenticated_user:
+            author = target_user
+        else:
+            if target_username != authenticated_user.username and authenticated_user.username != 'emma':
+                return jsonify({'error': 'Только Эмма может делать посты от имени других пользователей'}), 403
+            author = target_user
     else:
-        if not current_user.is_authenticated:
+        if not authenticated_user:
             return jsonify({'error': 'Not authenticated'}), 401
-        user = current_user
+        author = authenticated_user
     
-    if user.username == 'emma':
+    if author.username == 'emma':
         return jsonify({'error': 'Cannot create posts as Emma'}), 403
     
     post = Post(
-        author_id=user.id,
+        author_id=author.id,
         content=content,
         title=data.get('title', ''),
         is_private=True
@@ -148,13 +163,21 @@ def index():
     
     subdomain = get_subdomain()
     
-    if subdomain == 'test':
-        vuln_param = request.args.get('vuln_param', '')
-        posts = Post.query.filter_by(author_id=current_user.id).order_by(Post.created_at.desc()).all()
-        return render_template('test/index.html', vuln_param=vuln_param, posts=posts)
+    search_query = request.args.get('search', '')
     
-    posts = Post.query.filter_by(author_id=current_user.id).order_by(Post.created_at.desc()).all()
-    return render_template('blog/index.html', posts=posts)
+    posts_query = Post.query.filter_by(author_id=current_user.id)
+    
+    if search_query:
+        posts = posts_query.filter(Post.content.ilike(f'%{search_query}%')).order_by(Post.created_at.desc()).all()
+    else:
+        posts = posts_query.order_by(Post.created_at.desc()).all()
+    
+    if subdomain == 'test':
+        return render_template('test/index.html', search_query=search_query, posts=posts)
+    if subdomain == 'blog':
+        return render_template('blog/index.html', posts=posts, search_query=search_query)
+    
+    return redirect(url_for('login'))
 
 @app.route('/messages')
 @login_required
