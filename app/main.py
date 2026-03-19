@@ -49,7 +49,11 @@ def get_subdomain():
 def api_get_user(username):
     if request.method == 'OPTIONS':
         return '', 200
-    
+
+    if username == 'emma':
+        if not current_user.is_authenticated or current_user.username != 'emma':
+            return jsonify({'error': 'Forbidden'}), 403
+        
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -57,7 +61,7 @@ def api_get_user(username):
     return jsonify({
         'id': user.id,
         'username': user.username,
-        'bio': user.bio,
+        'bio': user.bio if username == 'emma' else '',
         'is_bot': user.is_bot
     })
 
