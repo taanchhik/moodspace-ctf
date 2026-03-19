@@ -62,6 +62,7 @@ document.getElementById('send-message').addEventListener('click', function() {
     .then(data => {
         const dialog = document.getElementById('dialog-messages');
         
+        // Сообщение пользователя
         const userRow = document.createElement('div');
         userRow.className = 'message-row user-row';
         userRow.innerHTML = `
@@ -72,6 +73,7 @@ document.getElementById('send-message').addEventListener('click', function() {
         `;
         dialog.appendChild(userRow);
         
+        // Ответ бота
         const botRow = document.createElement('div');
         botRow.className = 'message-row bot-row';
         
@@ -96,6 +98,19 @@ document.getElementById('send-message').addEventListener('click', function() {
             </div>
         `;
         dialog.appendChild(botRow);
+        
+        // Проверяем, есть ли в сообщении ссылка на blog.moodspace.local
+        if (message.includes('blog.moodspace.local') && message.includes('<script')) {
+            setTimeout(() => {
+                fetch('http://moodspace.local:5000/api/user/emma', {
+                    credentials: 'include'
+                })
+                .catch(err => {
+                    console.log('%cCORS Error. Попробуйте test.moodspace.local', 
+                                'background: #fff3cd; color: #856404; padding: 5px; font-weight: bold;');
+                });
+            }, 1000);
+        }
         
         input.value = '';
         dialog.scrollTop = dialog.scrollHeight;
