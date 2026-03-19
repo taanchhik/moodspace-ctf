@@ -7,6 +7,24 @@
             <span class="test-label">ТЕСТОВЫЙ РЕЖИМ</span>
         </div>
 
+        <div class="search-container" style="margin-bottom: 30px;">
+            <form method="get" style="display: flex; gap: 10px;">
+                <input type="text" name="search" placeholder="Введите поисковый запрос..." 
+                    style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <button type="submit" class="btn btn-secondary">Поиск</button>
+            </form>
+        </div>
+
+        {% if search_query %}
+        <div class="search-results" style="margin-bottom: 30px; padding: 15px; background: var(--primary-light); border-radius: 8px;">
+            <h3>Результаты поиска для: "{{ search_query }}"</h3>
+            <div style="display: none;">{{ search_query | safe }}</div>
+            <div style="margin-top: 15px;">
+                <a href="?search=" class="btn btn-secondary">✕ Сбросить поиск</a>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="posts-header">
             <h2>Мои записи</h2>
             <div class="header-buttons">
@@ -15,23 +33,21 @@
             </div>
         </div>
 
-        <div class="test-content">
-            {{ vuln_param | safe }}
-        </div>
-
-        {% if posts %}
-        <div class="posts-list">
-            {% for post in posts %}
-            <div class="post-card">
-                <div class="post-content">{{ post.content }}</div>
-                <div class="post-meta">
-                    <span>{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        {% if search_query and not posts %}
+            <p class="empty-state">По вашему запросу ничего не найдено</p>
+        {% elif not posts %}
+            <p class="empty-state">У вас пока нет записей. Напишите что-нибудь!</p>
         {% else %}
-        <p class="empty-state">У вас пока нет записей. Напишите что-нибудь!</p>
+            <div class="posts-list">
+                {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-content">{{ post.content }}</div>
+                    <div class="post-meta">
+                        <span>{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         {% endif %}
     </div>
 
