@@ -67,8 +67,8 @@
 ### Где спрятана уязвимость
 
 Есть два поддомена с разными настройками:
-- blog.moodspace.local — безопасный поддомен, CORS закрыт
-- test.moodspace.local — скрытый тестовый поддомен, CORS открыт и есть Reflected XSS
+- blog.moodspace.local — безопасный поддомен, CORS закрыт, есть XSS
+- test.moodspace.local — скрытый тестовый поддомен, CORS открыт, есть XSS
 
 1. XSS на обоих поддоменах - в файлах `app/templates/blog/index.html` и `app/templates/test/index.html`
    ```bash
